@@ -1,0 +1,232 @@
+﻿<div class="row" id="logpanel">
+    <div class="col-md-3"></div>
+    <div class="col-md-3 panel panel-default">
+        <div class="panel-heading">Login form</div>
+        <form class="panel-body">
+            <label>Enter login</label><br/>
+            <input id="login" class="form-control"/><br/>
+            <label>Enter password</label><br/>
+            <input type="password" id="pass" class="form-control"/>
+            <label id="loginresponse" style="color: red"></label>
+            <input type="submit" id="log" value="Login" class="btn btn-block btn-success"/>
+            <br/>
+            Don't have an account? <button id="regactive" class="btn btn-link">Register</button>
+        </form>
+
+    </div>
+
+    <div class="col-md-3 panel panel-danger">
+        <div class="panel-heading">Registry form</div>
+        <form class="panel-body">
+            <label>Enter login</label><br/>
+            <input id="username" class="form-control"/><br/>
+            <label>Enter password</label><br/>
+            <input type="password" id="password" class="form-control"/><br/>
+            <label>Confirm password</label><br/>
+            <input type="password" id="confirmpassword" class="form-control"/>
+            <label id="regresponse" style="color: red"></label>
+            <input type="submit" id="register" value="Register" class="btn btn-block btn-success"/><br/>
+        </form>
+    </div>
+
+    <div class="col-md-3">
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="btn-group-vertical" id="userlist" style="display: none">
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <button type="button" class="btn btn-success btn-lg btn-block" id="AddPost" onclick="OpenModal()">Add post</button>
+        <div id="posts" style="display: none">
+        </div>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<div class="modal fade" id="AddModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="text-align:center">Add a post</h3>
+            </div>
+            <div class="modal-body" style="padding: 40px">
+                <form role="form">
+                    <label for="title">Post title</label>
+                    <input type="text" id="title" class="form-control"/>
+                    <label for="text">Post text</label>
+                    <input type="text" id="text" class="form-control"/>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-block btn-success pull-right" id="Add"> Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+        });
+
+        function GetUsers() {
+            $.ajax({
+                url: '/api/values',
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function(xhr) {
+                    var token = sessionStorage.getItem("tokenInfo");
+                    xhr.setRequestHeader("Authorization", "Bearer " + token);
+                },
+                success: function(data) {
+                    WriteResponse(data);
+                }
+            });
+        }
+
+        function WriteResponse(users) {
+            var result = '<h4>Select a blog</h4><br/>';
+            var user = sessionStorage.getItem("username");
+            $.each(users, function (index, username) {
+                if (user === username) {
+                    result += '<button id="getblog" data-item="' + username + '" onclick="blog(this)" class="btn btn-info"> Your blog </button>';
+                } else {
+                    result += '<button id="getblog" data-item="' + username + '" onclick="blog(this)" class="btn btn-primary">' + username + '</button>';
+                }
+                
+            });
+            $('#userlist').html(result);
+        }
+
+        $(function() {
+            $('#register').click(function(e) {
+                e.preventDefault();
+                var data = {
+                    UserName: $('#username').val(),
+                    Password: $('#password').val(),
+                    ConfirmPassword: $('#confirmpassword').val()
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/Account/Register',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(data)
+                }).success(function() {
+                    alert('Register success');
+                }).fail(function() {
+                    $('regresponse').html('User with this login already exists!');
+                }).error(function() {
+                    $('regresponse').html('User with this login already exists!');
+                });
+            });
+        });
+
+        function WritePosts(posts) {
+            var result = '';
+            $.each(posts, function (index, post) {
+                result += '<div class="well well-sm" style="margin-top:10px"><h3><i>' +
+                    post.Title + '</i></h3><br /><h4>' +
+                    post.Text + '</h4></div>';
+            });
+            $('#posts').html(result);
+        }
+
+        function getposts(username) {
+            var adr = '/api/values?username=' + username;
+            $.ajax({
+                url: adr,
+                type: 'GET',
+                dataType: 'json',
+                beforeSend: function (xhr) {
+                    var token = sessionStorage.getItem("tokenInfo");
+                    xhr.setRequestHeader("Authorization", "Bearer " + token);
+                },
+                success: function (data) {
+                    $('#posts').css('display', 'block');
+                    WritePosts(data);
+                }
+            });
+        }
+
+        function blog(a) {
+            var username = $(a).attr('data-item');
+            getposts(username);           
+        }
+
+        $(function() {
+            $('#Add').click(function(event) {
+                event.preventDefault();
+                AddPost();
+                var user = sessionStorage.getItem("username");
+                getposts(user);
+            });
+        });
+
+        function AddPost() {
+            var item = {
+                Title: $('#title').val(),
+                Text: $('#text').val()
+            };
+
+            $.ajax({
+                url: '/api/values/',
+                type: 'POST',
+                data: JSON.stringify(item),
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function(xhr) {
+                    var token = sessionStorage.getItem("tokenInfo");
+                    
+                    xhr.setRequestHeader("Authorization", "Bearer " + token);
+                },
+                success: function() {
+                    $("#AddModal").modal("hide");
+                    var user = sessionStorage.getItem("username");
+                    getposts(user);
+                },
+                fail: function() {
+                    $("#AddModal").modal("hide");
+                    alert('Failed to add post');
+                },
+                error: function(x, y, z) {
+                    $("#AddModal").modal("hide");
+                    alert(x + y + z, item.Title, item.Text, item.Created);
+                }
+            });
+        }
+
+        function OpenModal() {
+            $("#AddModal").modal();
+        };
+
+
+        $(function() {
+            $('#log').click(function(e) {
+                e.preventDefault();
+                var loginData = {
+                    grant_type: 'password',
+                    username: $('#login').val(),
+                    password: $('#pass').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Token',
+                    data: loginData
+                }).success(function(data) {
+                    $('#response').html('Login success');
+                    $('#logpanel').css('display', 'none');
+                    $('#userlist').css('display', 'block');
+                    sessionStorage.setItem("tokenInfo", data.access_token);
+                    sessionStorage.setItem("username", $('#login').val());
+                    GetUsers();
+                }).fail(function() {
+                    $('#loginresponse').html('Wrong login or password');
+                });
+            });
+        });
+    </script>
+}
