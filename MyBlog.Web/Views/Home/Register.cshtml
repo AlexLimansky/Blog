@@ -1,0 +1,50 @@
+﻿<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 panel panel-danger">
+        <div class="panel-heading">Registry form</div>
+        <form class="panel-body">
+            <label>Enter login</label><br/>
+            <input id="username" class="form-control"/><br/>
+            <label>Enter password</label><br/>
+            <input type="password" id="password" class="form-control"/><br/>
+            <label>Confirm password</label><br/>
+            <input type="password" id="confirmpassword" class="form-control"/>
+            <label id="regresponse" style="color: red"></label>
+            <input type="submit" id="register" value="Register" class="btn btn-block btn-success"/>
+            <br/>
+            Have an account? <a href="../Home/Login" class="btn btn-link">Login</a>
+        </form>
+    </div>
+
+    <div class="col-md-4">
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function () {
+            $('#register').click(function (e) {
+                e.preventDefault();
+                var data = {
+                    UserName: $('#username').val(),
+                    Password: $('#password').val(),
+                    ConfirmPassword: $('#confirmpassword').val()
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/Account/Register',
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(data)
+                }).success(function () {
+                    alert('Register success');
+                }).fail(function () {
+                    $('regresponse').html('User with this login already exists!');
+                }).error(function () {
+                    $('regresponse').html('User with this login already exists!');
+                });
+            });
+        });
+    </script>
+}
+

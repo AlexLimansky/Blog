@@ -1,0 +1,47 @@
+﻿<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 panel panel-default">
+        <div class="panel-heading">Login form</div>
+        <form class="panel-body">
+            <label>Enter login</label><br />
+            <input id="login" class="form-control" /><br />
+            <label>Enter password</label><br />
+            <input type="password" id="pass" class="form-control" />
+            <label id="loginresponse" style="color: red"></label>
+            <input type="submit" id="log" value="Login" class="btn btn-block btn-success" />
+            <br />
+            Don't have an account? <a href="../Home/Register" class="btn btn-link">Register</a>
+        </form>
+    </div>
+    <div class="col-md-4">
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript">       
+        $(function () {
+            $('#log').click(function (e) {
+                e.preventDefault();
+                var loginData = {
+                    grant_type: 'password',
+                    username: $('#login').val(),
+                    password: $('#pass').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Token',
+                    data: loginData
+                }).success(function (data) {
+                    $('#response').html('Login success');
+                    sessionStorage.setItem("tokenInfo", data.access_token);
+                    sessionStorage.setItem("username", $('#login').val());
+                    $(location).attr('href', "/Home/Index");
+                }).fail(function () {
+                    $('#loginresponse').html('Wrong login or password');
+                });
+            });
+        });
+    </script>
+}
+

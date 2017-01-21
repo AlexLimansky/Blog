@@ -53,9 +53,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataContext\DataContext.cs" />
-    <Compile Include="Entities\Blog.cs" />
     <Compile Include="Entities\Comment.cs" />
     <Compile Include="Entities\Post.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

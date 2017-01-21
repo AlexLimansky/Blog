@@ -11,10 +11,8 @@ namespace MyBlog.Data.DataContext
 {
     public class DataContext : DbContext
     {
-        public DbSet<Blog> Blogs { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
-
         public DataContext() : base("DefaultConnection") { }
     }
 }

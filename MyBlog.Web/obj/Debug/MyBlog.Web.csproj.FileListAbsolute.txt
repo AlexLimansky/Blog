@@ -86,3 +86,5 @@ D:\Projects\MyBlog\MyBlog.Web\obj\Debug\MyBlog.Web.dll
 D:\Projects\MyBlog\MyBlog.Web\obj\Debug\MyBlog.Web.pdb
 D:\Projects\MyBlog\MyBlog.Web\bin\MyBlog.Data.dll
 D:\Projects\MyBlog\MyBlog.Web\bin\MyBlog.Data.pdb
+D:\Projects\MyBlog\MyBlog.Web\bin\MyBlog.Logic.dll
+D:\Projects\MyBlog\MyBlog.Web\bin\MyBlog.Logic.pdb
